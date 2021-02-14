@@ -39,9 +39,9 @@ const ChatContainer: FC<Props> = ({
   ctrlChatDetailOpen,
   ctrlChatTabOpen,
 }) => {
-  const rdxDispatch = useDispatch();
   const listRef = useRef<HTMLDivElement | null>(null);
   const classes = useStyles();
+  const rdxDispatch = useDispatch();
   const { loading, messages, errors } = useSelector<AppState, ChatState>(
     (state) => state.chat
   );

@@ -6,10 +6,10 @@ import { makeStyles, Grid, Paper, Link, Typography } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 
 import RouteNames from "../../util/routeNames";
-import useForm from "../../shared/hooks/formHook";
-import { AppState } from "../../store";
+import { AppDispatch, AppState } from "../../store";
 import { AuthState } from "../../store/auth/types";
 import { signUp } from "../../store/auth/actions";
+import useForm from "../../shared/hooks/formHook";
 import Input from "../../shared/components/ui/Input";
 import ProgressButton from "../../shared/components/ui/ProgressButton";
 
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 const SignUp: FC = () => {
   const classes = useStyles();
   const history = useHistory();
-  const rdxDispatch = useDispatch();
+  const rdxDispatch = useDispatch<AppDispatch>();
   const { loading, errors } = useSelector<AppState, AuthState>(
     (state) => state.auth
   );
@@ -62,12 +62,11 @@ const SignUp: FC = () => {
       signUp(
         formState.form["name"].value,
         formState.form["email"].value,
-        formState.form["password"].value,
-        () => {
-          history.push(RouteNames.SignIn);
-        }
+        formState.form["password"].value
       )
-    );
+    ).then(() => {
+      history.push(RouteNames.SignIn);
+    });
   };
   return (
     <Paper className={classes.paper} variant="outlined">

@@ -1,10 +1,7 @@
 import crypto from "crypto";
-import { ThunkAction } from "redux-thunk";
-
 import userImg from "../../img/user.jpg";
-import { AppState } from "./../index";
+import {  AppThunk } from "./../index";
 import {
-  ChatActions,
   CHAT_ACTION_ADD_MESSAGE,
   CHAT_ACTION_ERROR,
   CHAT_ACTION_FETCH_MESSAGES,
@@ -28,12 +25,7 @@ function exampleApi<T>(data: T, duration: number = 1000): Promise<T> {
   });
 }
 
-export const fetchMessages = (): ThunkAction<
-  void,
-  AppState,
-  unknown,
-  ChatActions
-> => {
+export const fetchMessages = (): AppThunk<Promise<void>> => {
   return async (dispatch) => {
     dispatch({
       type: CHAT_ACTION_PENDING,
@@ -67,7 +59,7 @@ export const fetchMessages = (): ThunkAction<
 
 export function addMessage(
   msg: Message
-): ThunkAction<void, AppState, unknown, ChatActions> {
+): AppThunk<Promise<void>> {
   return async (dispatch) => {
     try {
       const data = await exampleApi<Message>(msg, 4000);

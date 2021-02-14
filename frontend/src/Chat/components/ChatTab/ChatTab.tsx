@@ -1,4 +1,5 @@
 import { FC, useState, memo } from "react";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
   Avatar,
@@ -20,7 +21,9 @@ import {
 } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 
-import UserImg from "../../../img/user.jpg";
+import { AppState } from "../../../store";
+import { IConversationState } from "../../../store/conversation/types";
+// import UserImg from "../../../img/user.jpg";
 import ListItemLink from "../../../shared/components/ui/ListItemLink";
 import SideBar from "../../../shared/components/Navigation/SideBar";
 
@@ -83,10 +86,18 @@ const ChatTab: FC<Props> = ({ chatTabOpen, ctrlChatTabOpen }) => {
   const classes = useStyles({ tabCount: 2 });
   const [tabIndex, setTabIndex] = useState<number>(0);
   const { conversationId } = useParams<{ conversationId: string }>();
+  const { conversations } = useSelector<AppState, IConversationState>(
+    (state) => state.conversation
+  );
 
   const tabChanged = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
   };
+
+  const filteredConversations =
+    tabIndex === 0
+      ? conversations.filter((item) => item.sender.type === "FRIEND")
+      : conversations.filter((item) => item.sender.type === "GROUP");
 
   return (
     <SideBar
@@ -124,34 +135,35 @@ const ChatTab: FC<Props> = ({ chatTabOpen, ctrlChatTabOpen }) => {
       </div>
       <Divider />
       <List>
-        {["user1", "user2", "user3"].map((item: string) => (
-          <ListItemLink
-            key={item}
-            to={`/conversation/${item}`}
-            selected={item === conversationId}
-          >
-            <ListItemAvatar>
-              <Avatar src={UserImg} alt={item} />
-            </ListItemAvatar>
-            <ListItemText
-              style={{ overflow: "hidden" }}
-              primary={item}
-              secondary={
-                <Typography
-                  component="p"
-                  variant="body2"
-                  color="textPrimary"
-                  noWrap
-                >
-                  Lorem, ipsum dolor sit amethhhhh
-                </Typography>
-              }
-            />
-            <ListItemSecondaryAction>
-              <Avatar className={classes.notificationCount}>{1}</Avatar>
-            </ListItemSecondaryAction>
-          </ListItemLink>
-        ))}
+        {filteredConversations.length > 0 &&
+          filteredConversations.map((item) => (
+            <ListItemLink
+              key={item.id}
+              to={`/conversation/${item.id}`}
+              selected={item.id === conversationId}
+            >
+              <ListItemAvatar>
+                <Avatar src={item.sender.avatar} alt={item.sender.name} />
+              </ListItemAvatar>
+              <ListItemText
+                style={{ overflow: "hidden" }}
+                primary={item.sender.name}
+                secondary={
+                  <Typography
+                    component="p"
+                    variant="body2"
+                    color="textPrimary"
+                    noWrap
+                  >
+                    Lorem, ipsum dolor sit amethhhhh
+                  </Typography>
+                }
+              />
+              <ListItemSecondaryAction>
+                <Avatar className={classes.notificationCount}>{1}</Avatar>
+              </ListItemSecondaryAction>
+            </ListItemLink>
+          ))}
       </List>
     </SideBar>
   );

@@ -1,11 +1,12 @@
-import { FC, Fragment, useEffect } from "react";
+// import { FC, Fragment, useEffect } from "react";
+import { FC, Fragment } from "react";
 import {
   BrowserRouter as Router,
   Redirect,
   Route,
   Switch,
 } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+// import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
   createMuiTheme,
@@ -14,15 +15,16 @@ import {
 } from "@material-ui/core";
 import { purple } from "@material-ui/core/colors";
 
-import { AppState } from "./store";
-import { AuthState } from "./store/auth/types";
-import { autoSignIn } from "./store/auth/actions";
+// import { AppState } from "./store";
+// import { AuthState } from "./store/auth/types";
+// import { autoSignIn } from "./store/auth/actions";
 import RouteNames from "./util/routeNames";
 import Header from "./shared/components/Navigation/Header";
 import Home from "./Chat/pages/Home";
 import Notification from "./Chat/pages/Notification";
 import SignUp from "./Auth/pages/SignUp";
 import SignIn from "./Auth/pages/SignIn";
+import Conversation from "./Chat/pages/Conversation";
 
 const theme = createMuiTheme({
   overrides: {
@@ -54,24 +56,27 @@ const theme = createMuiTheme({
 });
 
 const App: FC = () => {
-  const { user } = useSelector<AppState, AuthState>((state) => state.auth);
-  const rdxDispatch = useDispatch();
+  // const { user } = useSelector<AppState, AuthState>((state) => state.auth);
+  // const rdxDispatch = useDispatch();
 
-  useEffect(() => {
-    rdxDispatch(autoSignIn());
-  }, [rdxDispatch]);
+  // useEffect(() => {
+  //   rdxDispatch(autoSignIn());
+  // }, [rdxDispatch]);
 
-  const routes = user.token ? (
+  const routes = true ? (
     <Fragment>
       <Header />
       <Switch>
+        <Route path={RouteNames.Home} exact>
+          <Home />
+        </Route>
         <Route path={RouteNames.Notification} exact>
           <Notification />
         </Route>
-        <Route path={RouteNames.Chat}>
-          <Home />
+        <Route path={RouteNames.Chat} exact>
+          <Conversation />
         </Route>
-        <Redirect to={"/conversation/user1"} />
+        <Redirect to={RouteNames.Home} />
       </Switch>
     </Fragment>
   ) : (

@@ -1,12 +1,11 @@
-import { ThunkAction } from "redux-thunk";
-
+import { AppThunk } from "..";
 import userImg from "../../img/user.jpg";
 import {
   getFromLocalStorage,
   removeFromLocalStorage,
   setToLocalStorage,
 } from "../../util";
-import { AppState } from "..";
+
 import {
   AuthActions,
   AUTH_ACTION_ERROR,
@@ -37,7 +36,7 @@ export function signOut(): AuthActions {
 
 export function authTimeout(
   duration: number
-): ThunkAction<void, AppState, unknown, AuthActions> {
+): AppThunk<void> {
   return (dispatch) => {
     logoutTimer = setTimeout(() => {
       dispatch(signOut());
@@ -48,7 +47,7 @@ export function authTimeout(
 export function signIn(
   email: string,
   password: string
-): ThunkAction<void, AppState, unknown, AuthActions> {
+): AppThunk<Promise<void>> {
   return async (dispatch) => {
     dispatch({
       type: AUTH_ACTION_PENDING,
@@ -84,9 +83,8 @@ export function signIn(
 export function signUp(
   name: string,
   email: string,
-  password: string,
-  cb: () => void
-): ThunkAction<void, AppState, unknown, AuthActions> {
+  password: string
+): AppThunk<Promise<void>> {
   return async (dispatch) => {
     dispatch({
       type: AUTH_ACTION_PENDING,
@@ -102,12 +100,11 @@ export function signUp(
           email: email,
           password: password,
         },
-        2000
+        5000
       );
       dispatch({
         type: AUTH_ACTION_SIGN_UP,
       });
-      cb();
     } catch (e) {
       console.log("Sign up Error", e);
       dispatch({
@@ -120,12 +117,7 @@ export function signUp(
   };
 }
 
-export function autoSignIn(): ThunkAction<
-  void,
-  AppState,
-  unknown,
-  AuthActions
-> {
+export function autoSignIn(): AppThunk<void> {
   return (dispatch) => {
     const localData = getFromLocalStorage<IUser>("userData");
     if (localData && localData.token && localData.expiration) {
