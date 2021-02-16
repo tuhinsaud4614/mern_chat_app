@@ -24,26 +24,22 @@ import Home from "./Chat/pages/Home";
 import Notification from "./Chat/pages/Notification";
 import SignUp from "./Auth/pages/SignUp";
 import SignIn from "./Auth/pages/SignIn";
-import Conversation from "./Chat/pages/Conversation";
 
 const theme = createMuiTheme({
   overrides: {
     MuiCssBaseline: {
       "@global": {
+        "*::-webkit-scrollbar": {
+          backgroundColor: "#F5F5F5",
+          width: "8px",
+        },
         "*::-webkit-scrollbar-track": {
           boxShadow: `inset 0 0 6px rgba(0,0,0,0.3)`,
           backgroundColor: "#F5F5F5",
-          // borderRadius: "10px",
-        },
-        "*::-webkit-scrollbar": {
-          width: "10px",
-          backgroundColor: "#F5F5F5",
+          width: "8px",
         },
         "*::-webkit-scrollbar-thumb": {
-          // borderRadius: "10px",
-          width: "10px",
-          backgroundColor: purple[500],
-          backgroundImage: `-webkit-linear-gradient(45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent)`,
+          border: ` 4px solid ${purple[200]}`,
         },
       },
     },
@@ -73,9 +69,9 @@ const App: FC = () => {
         <Route path={RouteNames.Notification} exact>
           <Notification />
         </Route>
-        <Route path={RouteNames.Chat} exact>
+        {/* <Route path={RouteNames.Chat} exact>
           <Conversation />
-        </Route>
+        </Route> */}
         <Redirect to={RouteNames.Home} />
       </Switch>
     </Fragment>

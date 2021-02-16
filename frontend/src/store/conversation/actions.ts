@@ -1,5 +1,6 @@
 import crypto from "crypto";
 
+import { getFromLocalStorage, setToLocalStorage } from "../../util";
 import { AppThunk } from "..";
 import userImg from "../../img/user.jpg";
 
@@ -7,7 +8,9 @@ import {
   CONVERSATION_ACTION_ERROR,
   CONVERSATION_ACTION_FETCH,
   CONVERSATION_ACTION_PENDING,
+  CONVERSATION_ACTION_SELECT,
   IConversation,
+  IConversationActions,
 } from "./types";
 
 function exampleApi<T>(data: T, duration: number = 1000): Promise<T> {
@@ -19,7 +22,7 @@ function exampleApi<T>(data: T, duration: number = 1000): Promise<T> {
 }
 const demoType: ["GROUP", "FRIEND"] = ["GROUP", "FRIEND"];
 
-export const fetchConversations = (): AppThunk<Promise<void | string>> => {
+export const fetchConversations = (): AppThunk<void> => {
   return async (dispatch) => {
     dispatch({
       type: CONVERSATION_ACTION_PENDING,
@@ -27,7 +30,7 @@ export const fetchConversations = (): AppThunk<Promise<void | string>> => {
     try {
       const data = await exampleApi<IConversation[]>(
         Array.from({ length: 15 }, (item, index) => ({
-          id:index === 0 ? "friend1" : index.toString(),
+          id: index === 0 ? "friend1" : index.toString(),
           receiver: "user",
           sender: {
             id: Date.now().toString(),
@@ -38,14 +41,21 @@ export const fetchConversations = (): AppThunk<Promise<void | string>> => {
           },
         }))
       );
+      let lastConversationId = getFromLocalStorage<string>(
+        "lastConversationId"
+      );
+      if (!lastConversationId) {
+        const temp = data.find((con) => con.sender.type === "FRIEND");
+        lastConversationId = temp ? temp.id : data[0].id;
+        if (lastConversationId) {
+          setToLocalStorage<string>("lastConversationId", lastConversationId);
+        }
+      }
       dispatch({
         type: CONVERSATION_ACTION_FETCH,
         conversations: data,
+        lastConversationId: lastConversationId,
       });
-      let lastChattedConId = data.find((con) => con.sender.type === "FRIEND");
-      if (lastChattedConId) {
-        return lastChattedConId.id;
-      }
     } catch (e) {
       console.log("Fetch conversation Error", e);
       dispatch({
@@ -59,5 +69,13 @@ export const fetchConversations = (): AppThunk<Promise<void | string>> => {
         ],
       });
     }
+  };
+};
+
+export const selectConversation = (id: string): IConversationActions => {
+  setToLocalStorage<string>("lastConversationId", id);
+  return {
+    type: CONVERSATION_ACTION_SELECT,
+    conId: id,
   };
 };

@@ -1,8 +1,9 @@
 import { ActionError } from "../types";
 
+export const CONVERSATION_ACTION_ERROR = "CONVERSATION_ACTION_ERROR";
 export const CONVERSATION_ACTION_FETCH = "CONVERSATION_ACTION_FETCH";
 export const CONVERSATION_ACTION_PENDING = "CONVERSATION_ACTION_PENDING";
-export const CONVERSATION_ACTION_ERROR = "CONVERSATION_ACTION_ERROR";
+export const CONVERSATION_ACTION_SELECT = "CONVERSATION_ACTION_SELECT";
 
 export interface IConversation {
   id: string;
@@ -17,6 +18,7 @@ export interface IConversation {
 
 export interface IConversationState {
   conversations: IConversation[];
+  lastConversationId: string | null;
   loading: boolean;
   errors: ActionError[];
 }
@@ -33,9 +35,16 @@ export interface IConversationActionError {
 export interface IConversationActionFetch {
   type: typeof CONVERSATION_ACTION_FETCH;
   conversations: IConversation[];
+  lastConversationId: string | null;
+}
+
+export interface IConversationActionSelect {
+  type: typeof CONVERSATION_ACTION_SELECT;
+  conId: string;
 }
 
 export type IConversationActions =
   | IConversationActionPending
   | IConversationActionError
-  | IConversationActionFetch;
+  | IConversationActionFetch
+  | IConversationActionSelect;

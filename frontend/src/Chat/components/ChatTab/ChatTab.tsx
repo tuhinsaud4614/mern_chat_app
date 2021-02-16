@@ -1,11 +1,11 @@
 import { FC, useState, memo } from "react";
-import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Avatar,
   Divider,
   InputBase,
   List,
+  ListItem,
   ListItemAvatar,
   ListItemSecondaryAction,
   ListItemText,
@@ -21,11 +21,11 @@ import {
 } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 
-import { AppState } from "../../../store";
+import { AppDispatch, AppState } from "../../../store";
 import { IConversationState } from "../../../store/conversation/types";
-// import UserImg from "../../../img/user.jpg";
-import ListItemLink from "../../../shared/components/ui/ListItemLink";
+import { selectConversation } from "../../../store/conversation/actions";
 import SideBar from "../../../shared/components/Navigation/SideBar";
+import ChatTabSkeleton from "../Skeleton/ChatTabSkeleton";
 
 const useStyles = makeStyles<Theme, { tabCount: number }>((theme) =>
   createStyles({
@@ -84,14 +84,19 @@ interface Props {
 
 const ChatTab: FC<Props> = ({ chatTabOpen, ctrlChatTabOpen }) => {
   const classes = useStyles({ tabCount: 2 });
+  const rdxDispatch = useDispatch<AppDispatch>();
   const [tabIndex, setTabIndex] = useState<number>(0);
-  const { conversationId } = useParams<{ conversationId: string }>();
-  const { conversations } = useSelector<AppState, IConversationState>(
-    (state) => state.conversation
-  );
+  const { loading, conversations, lastConversationId } = useSelector<
+    AppState,
+    IConversationState
+  >((state) => state.conversation);
 
   const tabChanged = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
+  };
+
+  const onChangeCon = (id: string) => {
+    rdxDispatch(selectConversation(id));
   };
 
   const filteredConversations =
@@ -107,64 +112,71 @@ const ChatTab: FC<Props> = ({ chatTabOpen, ctrlChatTabOpen }) => {
       isMobileOpen={chatTabOpen}
       classes={{ paper: classes.sidebarPaper }}
     >
-      <Typography
-        className={classes.title}
-        color="primary"
-        component="h3"
-        variant="h6"
-      >
-        Chat
-      </Typography>
-      <Divider />
-      <Tabs value={tabIndex} onChange={tabChanged}>
-        <Tab classes={{ root: classes.tab }} id="tab1" label="Friends" />
-        <Tab classes={{ root: classes.tab }} id="tab2" label="Groups" />
-      </Tabs>
-      <Divider />
-      <div className={classes.search}>
-        <div className={classes.searchIcon}>
-          <SearchIcon />
-        </div>
-        <InputBase
-          placeholder="Search"
-          classes={{
-            root: classes.inputRoot,
-            input: classes.inputInputs,
-          }}
-        />
-      </div>
-      <Divider />
-      <List>
-        {filteredConversations.length > 0 &&
-          filteredConversations.map((item) => (
-            <ListItemLink
-              key={item.id}
-              to={`/conversation/${item.id}`}
-              selected={item.id === conversationId}
-            >
-              <ListItemAvatar>
-                <Avatar src={item.sender.avatar} alt={item.sender.name} />
-              </ListItemAvatar>
-              <ListItemText
-                style={{ overflow: "hidden" }}
-                primary={item.sender.name}
-                secondary={
-                  <Typography
-                    component="p"
-                    variant="body2"
-                    color="textPrimary"
-                    noWrap
-                  >
-                    Lorem, ipsum dolor sit amethhhhh
-                  </Typography>
-                }
-              />
-              <ListItemSecondaryAction>
-                <Avatar className={classes.notificationCount}>{1}</Avatar>
-              </ListItemSecondaryAction>
-            </ListItemLink>
-          ))}
-      </List>
+      {loading ? (
+        <ChatTabSkeleton />
+      ) : (
+        <>
+          <Typography
+            className={classes.title}
+            color="primary"
+            component="h3"
+            variant="h6"
+          >
+            Chat
+          </Typography>
+          <Divider />
+          <Tabs value={tabIndex} onChange={tabChanged}>
+            <Tab classes={{ root: classes.tab }} id="tab1" label="Friends" />
+            <Tab classes={{ root: classes.tab }} id="tab2" label="Groups" />
+          </Tabs>
+          <Divider />
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInputs,
+              }}
+            />
+          </div>
+          <Divider />
+          <List>
+            {filteredConversations.length > 0 &&
+              filteredConversations.map((item) => (
+                <ListItem
+                  key={item.id}
+                  onClick={() => onChangeCon(item.id)}
+                  selected={item.id === lastConversationId}
+                  button
+                >
+                  <ListItemAvatar>
+                    <Avatar src={item.sender.avatar} alt={item.sender.name} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    style={{ overflow: "hidden" }}
+                    primary={item.sender.name}
+                    secondary={
+                      <Typography
+                        component="p"
+                        variant="body2"
+                        color="textPrimary"
+                        noWrap
+                      >
+                        Lorem, ipsum dolor sit amethhhhh
+                      </Typography>
+                    }
+                  />
+                  <ListItemSecondaryAction>
+                    <Avatar className={classes.notificationCount}>{1}</Avatar>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+          </List>
+        </>
+      )}
     </SideBar>
   );
 };

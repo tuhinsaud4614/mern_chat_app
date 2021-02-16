@@ -25,7 +25,7 @@ function exampleApi<T>(data: T, duration: number = 1000): Promise<T> {
   });
 }
 
-export const fetchMessages = (): AppThunk<Promise<void>> => {
+export const fetchMessages = (conId: string): AppThunk<Promise<void>> => {
   return async (dispatch) => {
     dispatch({
       type: CHAT_ACTION_PENDING,
